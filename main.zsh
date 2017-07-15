@@ -18,7 +18,7 @@ trap child-return CHLD
 
 cleanup () {
     kill -TERM "$CHILD_PID" &> /dev/null
-    rm -rf "$TMP"
+    rm "$BUFFER"
     exit
 }
 trap cleanup TERM INT QUIT
