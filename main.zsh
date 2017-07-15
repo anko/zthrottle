@@ -1,34 +1,50 @@
 #!/usr/bin/env zsh
 interval () {
-    zmodload zsh/system
-    zmodload zsh/zselect
+    INTERVAL="$1"
 
-    NEXT_ALLOWED_PRINT_TIME=0
-    NEXT=
-    INTERVAL="$*"
-    while true; do
-        if zselect -t 0 0; then
-            sysread -t 0 -s 1
-            STATUS=$?
-            case $STATUS in
-                5)
-                    if [[ -z $NEXT ]]; then
-                        exit
-                    fi
-                    ;;
-                0)
-                    read LINE
-                    NEXT="$REPLY$LINE"
-                    ;;
-            esac
-        fi
-        if [[ -n $NEXT ]] && (( $(epoch now) >= $NEXT_ALLOWED_PRINT_TIME )); then
-            print $NEXT
-            NEXT=
-            NEXT_ALLOWED_PRINT_TIME="$(epoch now + $INTERVAL)"
+    CHILD_PID=
+
+    TMP=$(mktemp --directory)
+    BUFFER="$TMP/buffer"
+    ALLOWED_MARKER="$TMP/allowed"
+    echo "1" > $ALLOWED_MARKER
+    IN_FLIGHT_MARKER="$TMP/in-flight"
+    echo -n '' > $IN_FLIGHT_MARKER
+
+    cleanup () {
+        rm -rf "$TMP"
+    }
+
+    while read LINE; do
+        #echo "buffering $LINE"
+        echo "$LINE" >> $BUFFER
+        #echo "buffer"
+        #cat $BUFFER
+        if [[ -s $ALLOWED_MARKER ]]; then
+            #echo "immed"
+            echo $LINE
+            echo -n '' > $ALLOWED_MARKER
+        else
+            if [[ ! -s $IN_FLIGHT_MARKER ]]; then
+                #echo "starting"
+                echo "1" > $IN_FLIGHT_MARKER
+                (
+                    sleep $INTERVAL
+                    #echo "hi"
+                    tail -n1 $BUFFER
+                    echo -n '' > $BUFFER
+                    echo 1 > $ALLOWED_MARKER
+                    echo -n '' > $IN_FLIGHT_MARKER
+                ) &
+                CHILD_PID=$!
+            fi
         fi
     done
+    if [[ -n $CHILD_PID ]]; then
+        wait $CHILD_PID &> /dev/null
+        cleanup
+    fi
 }
 
-( echo "1\n2\n3" ; sleep 2 ; echo "4" ) \
-    | interval 2 seconds
+( echo "1\n2\n3" ; sleep 2 ; echo "4\n5" ; sleep 5; echo "6" ) \
+    | interval 1
