@@ -47,7 +47,6 @@ while read LINE; do
             (
                 sleep $INTERVAL
                 tail -n1 $BUFFER
-                echo -n '' > $BUFFER
             ) &
             CHILD_PID=$!
         fi
