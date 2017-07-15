@@ -11,8 +11,11 @@ IN_FLIGHT_MARKER="$TMP/in-flight"
 echo -n '' > $IN_FLIGHT_MARKER
 
 cleanup () {
+    kill -TERM "$CHILD_PID" &> /dev/null
     rm -rf "$TMP"
+    exit
 }
+trap cleanup TERM INT QUIT
 
 while read LINE; do
     #echo "buffering $LINE"
