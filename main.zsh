@@ -4,12 +4,12 @@ INTERVAL="$1"
 CHILD_PID=
 
 BUFFER=$(mktemp)
-ALLOWED=1
+CAN_PRINT_IMMEDIATELY=1
 IN_FLIGHT=
 
 child-return () {
     IN_FLIGHT=
-    ALLOWED=1
+    CAN_PRINT_IMMEDIATELY=1
 }
 trap child-return CHLD
 
@@ -22,9 +22,9 @@ trap cleanup TERM INT QUIT
 
 while read LINE; do
     echo "$LINE" >> $BUFFER
-    if [[ -n $ALLOWED ]]; then
+    if [[ -n $CAN_PRINT_IMMEDIATELY ]]; then
         echo $LINE
-        ALLOWED=
+        CAN_PRINT_IMMEDIATELY=
     else
         if [[ -z $IN_FLIGHT ]]; then
             IN_FLIGHT=1
