@@ -5,10 +5,10 @@ CHILD_PID=
 
 BUFFER=$(mktemp)
 CAN_PRINT_IMMEDIATELY=1
-IN_FLIGHT=
+CAN_START_SUBPROCESS=1
 
 child-return () {
-    IN_FLIGHT=
+    CAN_START_SUBPROCESS=1
     CAN_PRINT_IMMEDIATELY=1
 }
 trap child-return CHLD
@@ -26,8 +26,8 @@ while read LINE; do
         echo $LINE
         CAN_PRINT_IMMEDIATELY=
     else
-        if [[ -z $IN_FLIGHT ]]; then
-            IN_FLIGHT=1
+        if [[ -n $CAN_START_SUBPROCESS ]]; then
+            CAN_START_SUBPROCESS=
             (
                 sleep $INTERVAL
                 tail -n1 $BUFFER
