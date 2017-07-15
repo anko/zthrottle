@@ -6,16 +6,21 @@ After each cooldown interval, only the most recent line is printed.
 If you've used `lodash.js`' [`_.throttle`][lodash-throttle], this is that, but
 for the \*NIX command line.
 
-Here's an illustration adapted from [the UNIX SE question][question].  Arrows
-represent data being written.
+## Example
+
+Here's an illustration of what happens when you run—
+
+```zsh
+firehose | zthrottle 1 | expensive
+```
 
 ![example of what happens][illustration]
 
-## Install
+Arrows represent data being written.
 
-Just put `zinterval` in your `$PATH`.
+Here's a GIF of that:
 
-You need [`zsh`][wiki-zsh].
+![the same example as a GIF][gif]
 
 ## Why
 
@@ -29,13 +34,19 @@ firehose | zthrottle 1 | expensive
 # -> `expensive` gets the most recent `firehose` line, but at 1 Hz
 ```
 
+## Install
+
+Just put `zinterval` in your `$PATH`.
+
+You need [`zsh`][wiki-zsh].
+
 ## License
 
 [Unlicense][unlicense].  Public domain.  Use freely.
 
 
+[gif]: https://user-images.githubusercontent.com/5231746/28240490-f6b818b6-697a-11e7-9923-1d976b542582.gif
 [illustration]: https://user-images.githubusercontent.com/5231746/28240427-a0bbf3c0-6979-11e7-9c0c-b597bafd3873.png
 [lodash-throttle]: https://lodash.com/docs/4.17.4#throttle
-[question]: https://unix.stackexchange.com/q/378334/16404
 [unlicense]: https://unlicense.org/
 [wiki-zsh]: https://en.wikipedia.org/wiki/Z_shell
