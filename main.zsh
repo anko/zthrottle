@@ -1,4 +1,7 @@
 #!/usr/bin/env zsh
+# Lets a line pass only once every $1 seconds.  If multiple lines arrive during
+# the cooldown interval, only the latest is passed on when the cooldown ends.
+
 INTERVAL="$1"
 
 CHILD_PID=
@@ -20,6 +23,19 @@ cleanup () {
 }
 trap cleanup TERM INT QUIT
 
+# Possible states:
+#
+# - CAN_PRINT_IMMEDIATELY == 1, CAN_START_SUBPROCESS == 1
+#     -> print immediately
+#
+# - CAN_PRINT_IMMEDIATELY == 0, CAN_START_SUBPROCESS == 1
+#     -> buffer the line; start a subprocess to handle it
+#
+# - CAN_PRINT_IMMEDIATELY == 0, CAN_START_SUBPROCESS == 0
+#     -> buffer the line; let the in-flight subprocess handle it
+#
+# The state of (CAN_PRINT_IMMEDIATELY == 1, CAN_START_SUBPROCESS == 0) should
+# never happen.
 while read LINE; do
     echo "$LINE" >> $BUFFER
     if [[ -n $CAN_PRINT_IMMEDIATELY ]]; then
