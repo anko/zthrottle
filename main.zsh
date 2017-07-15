@@ -37,11 +37,11 @@ trap cleanup TERM INT QUIT
 # The state of (CAN_PRINT_IMMEDIATELY == 1, CAN_START_SUBPROCESS == 0) should
 # never happen.
 while read LINE; do
-    echo "$LINE" >> $BUFFER
     if [[ -n $CAN_PRINT_IMMEDIATELY ]]; then
         echo $LINE
         CAN_PRINT_IMMEDIATELY=
     else
+        echo "$LINE" > $BUFFER
         if [[ -n $CAN_START_SUBPROCESS ]]; then
             CAN_START_SUBPROCESS=
             (
