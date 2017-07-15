@@ -21,21 +21,15 @@ cleanup () {
 trap cleanup TERM INT QUIT
 
 while read LINE; do
-    #echo "buffering $LINE"
     echo "$LINE" >> $BUFFER
-    #echo "buffer"
-    #cat $BUFFER
     if [[ -n $ALLOWED ]]; then
-        #echo "immed"
         echo $LINE
         ALLOWED=
     else
         if [[ -z $IN_FLIGHT ]]; then
-            #echo "starting"
             IN_FLIGHT=1
             (
                 sleep $INTERVAL
-                #echo "hi"
                 tail -n1 $BUFFER
                 echo -n '' > $BUFFER
             ) &
