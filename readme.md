@@ -36,7 +36,7 @@ firehose | zthrottle 1 | expensive
 
 ## Install
 
-Just put `zinterval` in your `$PATH`.
+Just put `zthrottle` in your `$PATH`.
 
 You need [`zsh`][wiki-zsh].
 
